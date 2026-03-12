@@ -7,6 +7,7 @@
     <title>Macro-Financial Insights Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="data/dashboard_data.js"></script>
     <style>
         :root {
@@ -256,6 +257,33 @@
             border-top: 1px solid #f1f5f9;
         }
 
+        .export-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+        }
+
+        .export-btn:hover {
+            background: #f1f5f9;
+            opacity: 1;
+        }
+
+        .export-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--text-sub);
+        }
+
+        .export-btn:hover svg {
+            fill: var(--primary-green);
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: 1rem;
@@ -409,8 +437,13 @@
                         <h3>${item.title}</h3>
                         <p>${item.subtitle}</p>
                     </div>
-                    <div class="trend-badge ${item.trend >= 0 ? 'trend-up' : 'trend-down'}">
-                        ${item.trend >= 0 ? '↑' : '↓'} ${Math.abs(item.trend)}%
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                        <div class="trend-badge ${item.trend >= 0 ? 'trend-up' : 'trend-down'}">
+                            ${item.trend >= 0 ? '↑' : '↓'} ${Math.abs(item.trend)}%
+                        </div>
+                        <button class="export-btn" title="Download to Excel" onclick="downloadExcel('${item.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M16,11V15H13V15H11V15H8L12,19L16,15H14V11H16Z"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="metric-value">${item.unit === 'Crores' ? '₹' : ''}${item.metric.toLocaleString('en-IN')} <span style="font-size:0.7rem; font-weight:400; color:var(--text-sub)">${item.unit}</span></div>
@@ -481,10 +514,42 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false } },
-                    scales: { x: { display: false }, y: { display: false } }
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { enabled: true, mode: 'index', intersect: false } 
+                    },
+                    scales: { 
+                        x: { 
+                            display: true,
+                            grid: { display: false },
+                            ticks: { font: { size: 8 }, maxRotation: 0, autoSkip: true }
+                        }, 
+                        y: { 
+                            display: true,
+                            grid: { color: 'rgba(0,0,0,0.03)' },
+                            ticks: { font: { size: 8 } }
+                        } 
+                    }
                 }
             });
+        }
+
+        function downloadExcel(id) {
+            const item = allData.find(d => d.id === id);
+            if (!item) return;
+
+            const ws_data = [
+                ["Date", item.title + " (" + item.unit + ")"]
+            ];
+            
+            item.labels.forEach((label, index) => {
+                ws_data.push([label, item.values[index]]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, "Metric Data");
+            XLSX.writeFile(wb, `${item.title.replace(/ /g, '_')}_data.xlsx`);
         }
 
         init();
