@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Data Pipeline (Large/Raw Files)
+data/bronze/
+data/silver/
+data/gold/
+rbi_datasets/
+amfi_latest_data/
+amfi_datasets/
+logs/
+
+# Dashboard Data (WE NEED THE JS FILE)
+!data/dashboard_data.js
+data/*.json
+data/*.csv
+
+# OS
+.DS_Store
+~$*

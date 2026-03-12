@@ -1,0 +1,12 @@
+pandas
+polars
+requests
+httpx
+playwright
+pydantic
+duckdb
+pyyaml
+openpyxl
+lxml
+beautifulsoup4
+python-dotenv
