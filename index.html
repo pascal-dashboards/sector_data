@@ -5,27 +5,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Macro-Financial Insights Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="data/dashboard_data.js"></script>
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --primary-green: #10b981;
-            --dark-green: #064e3b;
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            /* Gray Scale */
+            --gray-25: #FDFDFD;
+            --gray-40: #F0F0F0;
+            --gray-50: #F9FAFA;
+            --gray-100: #F5F5F5;
+            --gray-150: #EEEEEE;
+            --gray-200: #EDEDEE;
+            --gray-300: #D3D4D5;
+            --gray-400: #ABADAF;
+            --gray-500: #7D7F83;
+            --gray-600: #52555A;
+            --gray-700: #33373D;
+            --gray-800: #1D2025;
+            --gray-900: #171A1D;
+            --gray-950: #0A0D12;
+
+            /* Primary Scale (Green) */
+            --primary-25: #F7FDF9;
+            --primary-30: #F3F6F7;
+            --primary-50: #EBFAF0;
+            --primary-100: #DCF9E8;
+            --primary-200: #BCF0D5;
+            --primary-300: #8DE2B5;
+            --primary-400: #55C390;
+            --primary-500: #279C7B;
+            --primary-600: #1C8672;
+            --primary-700: #137068;
+            --primary-800: #0C595A;
+            --primary-900: #07434A;
+            --primary-950: #052A2E;
+
+            /* Semantic Mappings */
+            --bg-color: var(--gray-50);
+            --card-bg: var(--gray-25);
+            --primary-green: var(--primary-500);
+            --dark-green: var(--primary-700);
+            --text-main: var(--gray-800);
+            --text-sub: var(--gray-500);
+            --border-color: var(--gray-200);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --card-radius: 8px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Nunito Sans', sans-serif;
         }
 
         body {
@@ -50,15 +83,16 @@
         }
 
         .title-group h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--dark-green);
-            letter-spacing: -0.025em;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gray-800);
+            letter-spacing: -0.02em;
         }
 
         .title-group p {
-            color: var(--text-sub);
-            font-size: 0.875rem;
+            color: var(--gray-500);
+            font-size: 0.8125rem;
+            font-weight: 500;
             margin-top: 0.25rem;
         }
 
@@ -78,14 +112,17 @@
         .search-input {
             width: 100%;
             padding: 0.6rem 1rem 0.6rem 2.5rem;
+            background: white;
             border: 1px solid var(--border-color);
-            border-radius: 9999px;
+            border-radius: 8px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
+            font-size: 0.875rem;
         }
 
         .search-input:focus {
             border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px var(--primary-50);
         }
 
         .search-icon {
@@ -105,10 +142,10 @@
         .filter-btn {
             background: white;
             border: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             color: var(--text-sub);
@@ -117,13 +154,14 @@
         .filter-btn:hover {
             border-color: var(--primary-green);
             color: var(--primary-green);
+            background: var(--primary-25);
         }
 
         .filter-btn.active {
             background: var(--primary-green);
             border-color: var(--primary-green);
             color: white;
-            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+            box-shadow: 0 4px 10px 0 rgba(39, 156, 123, 0.2);
         }
 
         .subsector-nav {
@@ -153,21 +191,27 @@
         }
 
         .section-header {
-            margin: 2rem 0 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            color: var(--dark-green);
-            font-size: 1.25rem;
-            font-weight: 700;
+            margin: 3rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--gray-800);
+            font-size: 1.125rem;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            letter-spacing: -0.01em;
         }
 
         .section-count {
-            font-size: 0.875rem;
-            font-weight: 400;
-            color: var(--text-sub);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            background: var(--gray-50);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .grid {
@@ -181,19 +225,20 @@
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 1.25rem;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(8px);
-            transition: transform 0.2s;
+            transition: all 0.2s ease-in-out;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 1rem;
             height: 100%;
         }
 
         .card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary-200);
         }
 
         .card-header {
@@ -203,10 +248,10 @@
         }
 
         .card-title h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             color: var(--text-main);
-            line-height: 1.2;
+            line-height: 1.4;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -214,26 +259,30 @@
         }
 
         .card-title p {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-sub);
-            margin-top: 0.2rem;
+            margin-top: 0.25rem;
         }
 
         .trend-badge {
             font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
         .trend-up {
-            background: #ecfdf5;
-            color: #059669;
+            background: var(--primary-50);
+            color: var(--primary-600);
+            border: 1px solid var(--primary-100);
         }
 
         .trend-down {
-            background: #fef2f2;
-            color: #dc2626;
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #ffe4e6;
         }
 
         .metric-value {
@@ -251,33 +300,35 @@
         .footer-info {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
-            color: var(--text-sub);
-            padding-top: 0.5rem;
-            border-top: 1px solid #f1f5f9;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-100);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .export-btn {
-            background: none;
-            border: none;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            opacity: 0.6;
         }
 
         .export-btn:hover {
-            background: #f1f5f9;
-            opacity: 1;
+            background: var(--primary-50);
+            border-color: var(--primary-200);
         }
 
         .export-btn svg {
             width: 14px;
             height: 14px;
-            fill: var(--text-sub);
+            fill: var(--gray-400);
         }
 
         .export-btn:hover svg {
